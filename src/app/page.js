@@ -1,28 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
-import io from "socket.io-client";
 
-let socket;
+import { useSelector } from "react-redux";
+import useSensorSocket from "@/redux/hooks/useSensorSocket";
 
 export default function SensorPage() {
-  const [sensorData, setSensorData] = useState(null);
+  useSensorSocket(); // Establish WebSocket connection
 
-  useEffect(() => {
-    // Connect to the Socket.IO server
-    socket = io("http://localhost:3000"); // Ensure the server is running at this address
-
-    // Listen for the "sensorData" event
-    socket.on("sensorData", (data) => {
-      setSensorData(data);
-    });
-
-    // Clean up the connection on component unmount
-    return () => {
-      if (socket) {
-        socket.disconnect();
-      }
-    };
-  }, []);
+  const sensorData = useSelector((state) => state.sensor.data);
 
   return (
     <div>
