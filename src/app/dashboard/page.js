@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Droplets, Gauge, Thermometer, Wind, ChevronDown } from "lucide-react";
+import { Droplets, Gauge, Thermometer, Wind } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from "recharts";
 
+import { Badge, Card, Alert, Select } from "../../components";
 // Dummy data for demonstration
 const weatherData = {
   temperature: 28,
@@ -40,53 +41,6 @@ const historicalData = [
   { month: "Mei", rainfall: 60 },
   { month: "Jun", rainfall: 40 },
 ];
-
-const Card = ({ title, icon, children }) => (
-  <div className="bg-white rounded-lg shadow-md p-4">
-    <div className="flex justify-between items-center mb-2">
-      <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-      {icon}
-    </div>
-    {children}
-  </div>
-);
-
-const Select = ({ options }) => (
-  <div className="relative">
-    <select className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-      {options.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-      <ChevronDown className="h-4 w-4" />
-    </div>
-  </div>
-);
-
-const Alert = ({ title, children }) => (
-  <div
-    className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4"
-    role="alert"
-  >
-    <p className="font-bold">{title}</p>
-    <p>{children}</p>
-  </div>
-);
-
-const Badge = ({ children, variant = "default" }) => (
-  <span
-    className={`px-2 py-1 text-xs font-semibold rounded-full ${
-      variant === "default"
-        ? "bg-blue-500 text-white"
-        : "bg-white text-blue-500 border border-blue-500"
-    }`}
-  >
-    {children}
-  </span>
-);
 
 export default function MiniweatherDashboard() {
   const [timeRange, setTimeRange] = useState("24jam");
