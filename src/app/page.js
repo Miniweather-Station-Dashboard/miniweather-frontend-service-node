@@ -1,12 +1,9 @@
 "use client";
 
 import { useSelector } from "react-redux";
-import useSensorSocket from "@/redux/hooks/useSensorSocket";
 
 export default function SensorPage() {
-  useSensorSocket(); // Establish WebSocket connection
-
-  const sensorData = useSelector((state) => state.sensor.data);
+  const sensorData = useSelector((state) => state.sensor.temparature);
 
   return (
     <div>

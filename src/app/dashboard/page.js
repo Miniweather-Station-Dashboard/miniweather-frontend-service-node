@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Droplets, Gauge, Thermometer, Wind } from "lucide-react";
 import {
   Bar,
@@ -14,6 +15,8 @@ import {
 } from "recharts";
 
 import { Badge, Card, Alert, Select } from "../../components";
+import useSensorSocket from "@/redux/hooks/useSensorSocket";
+
 // Dummy data for demonstration
 const weatherData = {
   temperature: 28,
@@ -44,6 +47,8 @@ const historicalData = [
 
 export default function MiniweatherDashboard() {
   const [timeRange, setTimeRange] = useState("24jam");
+  useSensorSocket();
+  const sensorData = useSelector((state) => state.sensor);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -61,7 +66,7 @@ export default function MiniweatherDashboard() {
               icon={<Thermometer className="h-4 w-4 text-gray-400" />}
             >
               <div className="text-2xl font-bold">
-                {weatherData.temperature}°C
+                {sensorData.temperature}°C
               </div>
               <p className="text-xs text-gray-500">
                 Kelembaban: {weatherData.humidity}%
@@ -72,7 +77,7 @@ export default function MiniweatherDashboard() {
               icon={<Wind className="h-4 w-4 text-gray-400" />}
             >
               <div className="text-2xl font-bold">
-                {weatherData.windSpeed} km/jam
+                {sensorData.windSpeed} km/jam
               </div>
               <p className="text-xs text-gray-500">
                 Arah: {weatherData.windDirection}
@@ -82,9 +87,7 @@ export default function MiniweatherDashboard() {
               title="Curah Hujan"
               icon={<Droplets className="h-4 w-4 text-gray-400" />}
             >
-              <div className="text-2xl font-bold">
-                {weatherData.rainfall} mm
-              </div>
+              <div className="text-2xl font-bold">{sensorData.rainfall} mm</div>
               <p className="text-xs text-gray-500">Dalam 24 jam terakhir</p>
             </Card>
             <Card
@@ -92,7 +95,7 @@ export default function MiniweatherDashboard() {
               icon={<Gauge className="h-4 w-4 text-gray-400" />}
             >
               <div className="text-2xl font-bold">
-                {weatherData.pressure} hPa
+                {sensorData.pressure} hPa
               </div>
               <p className="text-xs text-gray-500">
                 Tinggi Pasang: {weatherData.tideLevel} m

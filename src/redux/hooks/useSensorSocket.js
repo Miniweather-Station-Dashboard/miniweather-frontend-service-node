@@ -9,10 +9,16 @@ export default function useSensorSocket() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    console.log("Connecting to sensor socket server");
     socket = io("http://localhost:3000");
 
-    socket.on("sensorData", (data) => {
-      dispatch(setSensorData(data));
+    socket.on("sensorData", async (data) => {
+      // Convert buffer to string using TextDecoder and then parse as JSON
+      const textDecoder = new TextDecoder("utf-8");
+      const jsonString = textDecoder.decode(data);
+      const serializableData = JSON.parse(jsonString);
+      console.log("Received sensor data:", serializableData);
+      dispatch(setSensorData(serializableData));
     });
 
     return () => {
