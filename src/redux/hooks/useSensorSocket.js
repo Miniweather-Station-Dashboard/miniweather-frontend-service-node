@@ -13,14 +13,26 @@ export default function useSensorSocket() {
     socket = io("http://localhost:3000");
 
     socket.on("sensorData", async (data) => {
-      // Convert buffer to string using TextDecoder and then parse as JSON
-      const textDecoder = new TextDecoder("utf-8");
-      const jsonString = textDecoder.decode(data);
-      const serializableData = JSON.parse(jsonString);
-      console.log("Received sensor data:", serializableData);
-      dispatch(setSensorData(serializableData));
+      try {
+        let serializableData;
+    
+        if (data instanceof ArrayBuffer) {
+          const textDecoder = new TextDecoder("utf-8");
+          const jsonString = textDecoder.decode(data);
+          serializableData = JSON.parse(jsonString);
+        } else if (typeof data === "string") {
+          serializableData = JSON.parse(data);
+        } else {
+          serializableData = data;
+        }
+    
+        console.log("Received sensor data:", serializableData);
+        dispatch(setSensorData(serializableData));
+      } catch (error) {
+        console.error("Error processing sensor data:", error);
+      }
     });
-
+    
     return () => {
       if (socket) {
         socket.disconnect();
