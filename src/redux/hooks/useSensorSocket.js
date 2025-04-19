@@ -19,11 +19,11 @@ export default function useSensorSocket() {
         if (data instanceof ArrayBuffer) {
           const textDecoder = new TextDecoder("utf-8");
           const jsonString = textDecoder.decode(data);
-          serializableData = JSON.parse(jsonString);
+          serializableData = JSON.parse(jsonString).data;
         } else if (typeof data === "string") {
-          serializableData = JSON.parse(data);
+          serializableData = JSON.parse(data).data;
         } else {
-          serializableData = data;
+          serializableData = data.data;
         }
     
         console.log("Received sensor data:", serializableData);

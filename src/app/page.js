@@ -16,9 +16,9 @@ export default function LandingPage() {
 
       <footer className="mt-12 text-center">
         <p className="mb-4 text-gray-400">Siap menghadapi bencana dengan pemantauan cuaca yang akurat.</p>
-        <button className="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition">
+        <a href="/dashboard" className="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition">
           Menuju ke Dashboard
-        </button>
+        </a>
       </footer>
     </div>
   );

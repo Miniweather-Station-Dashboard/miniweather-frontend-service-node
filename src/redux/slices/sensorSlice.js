@@ -13,7 +13,7 @@ const sensorSlice = createSlice({
   initialState,
   reducers: {
     setSensorData: (state, action) => {
-      console.log("Received sensor data:", action.payload);
+      console.log("Received sensor data here:", action.payload);
       const { temperature, wind_speed, rainfall, pressure, timestamp } =
         action.payload;
 
@@ -22,8 +22,8 @@ const sensorSlice = createSlice({
         typeof temperature === "number" &&
         typeof wind_speed === "number" &&
         typeof rainfall === "number" &&
-        typeof pressure === "number" &&
-        typeof timestamp === "number"
+        typeof pressure === "number" 
+        // typeof timestamp === "number"
       ) {
         state.temperature = parseFloat(temperature.toFixed(2));
         state.windSpeed = parseFloat(wind_speed.toFixed(2));
