@@ -24,9 +24,7 @@ export default function useSensorSocket() {
           serializableData = JSON.parse(data).data;
         } else {
           serializableData = data.data;
-        }
-    
-        console.log("Received sensor data:", serializableData);
+        }    
         dispatch(setSensorData(serializableData));
       } catch (error) {
         console.error("Error processing sensor data:", error);

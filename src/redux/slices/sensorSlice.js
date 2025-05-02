@@ -13,7 +13,6 @@ const sensorSlice = createSlice({
   initialState,
   reducers: {
     setSensorData: (state, action) => {
-      console.log("Received sensor data here:", action.payload);
       const { temperature, wind_speed, rainfall, pressure, timestamp } =
         action.payload;
 

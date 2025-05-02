@@ -16,6 +16,7 @@ import {
 
 import { Badge, Card, Alert, Select } from "../../components";
 import useSensorSocket from "@/redux/hooks/useSensorSocket";
+import useSensorHistory from "@/redux/hooks/fetchHistoryData";
 
 // Dummy data for demonstration
 const weatherData = {
@@ -36,18 +37,12 @@ const forecastData = [
   { day: "Jum", temp: 29, rain: 30 },
 ];
 
-const historicalData = [
-  { month: "Jan", rainfall: 100 },
-  { month: "Feb", rainfall: 120 },
-  { month: "Mar", rainfall: 150 },
-  { month: "Apr", rainfall: 80 },
-  { month: "Mei", rainfall: 60 },
-  { month: "Jun", rainfall: 40 },
-];
-
 export default function MiniweatherDashboard() {
-  const [timeRange, setTimeRange] = useState("24jam");
   useSensorSocket();
+  useSensorHistory();
+  const historicalData =
+    useSelector((state) => state.sensorHistoryData?.historyData) || [];
+  const [timeRange, setTimeRange] = useState("24jam");
   const sensorData = useSelector((state) => state.sensor);
 
   return (
@@ -127,21 +122,42 @@ export default function MiniweatherDashboard() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg font-semibold mb-2">Data Historis</h3>
-              <p className="text-sm text-gray-500 mb-4">Curah hujan bulanan</p>
+              <p className="text-sm text-gray-500 mb-4">
+                Data suhu per menit (24 jam terakhir)
+              </p>
               <ResponsiveContainer width="100%" height={350}>
                 <LineChart data={historicalData}>
-                  <XAxis dataKey="month" />
+                  <XAxis
+                    dataKey="timestamp"
+                    tickFormatter={(timeStr) =>
+                      new Date(timeStr).toLocaleTimeString("id-ID", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    }
+                    minTickGap={20}
+                  />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip
+                    labelFormatter={(label) =>
+                      new Date(label).toLocaleTimeString("id-ID", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    }
+                  />
                   <Line
                     type="monotone"
-                    dataKey="rainfall"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
+                    dataKey="temperature"
+                    stroke="#8884d8"
                   />
+                  <Line type="monotone" dataKey="windSpeed" stroke="#82ca9d" />
+                  <Line type="monotone" dataKey="rainfall" stroke="#ffc658" />
+                  <Line type="monotone" dataKey="pressure" stroke="#ff7300" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
+
             <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg font-semibold mb-4">Informasi Tambahan</h3>
               <div className="space-y-4">
