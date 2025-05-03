@@ -1,25 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Droplets, Gauge, Thermometer, Wind } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
-
-import { Badge, Card, Alert, Select } from "../../components";
+import { Alert, Select } from "../../components/Atom";
 import useSensorSocket from "@/redux/hooks/useSensorSocket";
 import useSensorHistory from "@/redux/hooks/fetchHistoryData";
+import AdditionalInfo from "@/components/AdditionalInfo";
+import ForecastChart from "@/components/ForecastChart";
+import HistoricalChart from "@/components/HistoricalChart";
+import WeatherCard from "@/components/WeatherCard";
+import { setActiveDevice } from "@/redux/slices/deviceSlice";
 
-// Dummy data for demonstration
-const weatherData = {
+// Constants
+const WEATHER_DATA = {
   temperature: 28,
   humidity: 75,
   windSpeed: 15,
@@ -29,85 +22,71 @@ const weatherData = {
   tideLevel: 1.2,
 };
 
-const forecastData = [
-  { day: "Sen", temp: 29, rain: 20 },
-  { day: "Sel", temp: 30, rain: 10 },
-  { day: "Rab", temp: 28, rain: 40 },
-  { day: "Kam", temp: 27, rain: 60 },
-  { day: "Jum", temp: 29, rain: 30 },
-];
-
 export default function MiniweatherDashboard() {
+  const dispatch = useDispatch();
   useSensorSocket();
   useSensorHistory();
-  const historicalData =
-    useSelector((state) => state.sensorHistoryData?.historyData) || [];
-  const [timeRange, setTimeRange] = useState("24jam");
+  
+  const historicalData = useSelector((state) => state.sensorHistoryData?.historyData) || [];
   const sensorData = useSelector((state) => state.sensor);
+  const deviceList = useSelector((state) => state.device.deviceList) || [];
+  const activeDevice = useSelector((state) => state.device.activeDevice);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <header className="sticky top-0 z-10 border-b bg-white shadow-sm">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <h1 className="text-2xl font-bold">Miniweather Station Dashboard</h1>
-          <Select options={["Pantai Utara", "Pantai Selatan", "Pelabuhan"]} />
+          <Select
+            value={activeDevice?.name}
+            options={deviceList.map((d) => d.name)}
+            onChange={(selectedName) => {
+              const selectedDevice = deviceList.find(
+                (d) => d.name === selectedName
+              );
+              if (selectedDevice) {
+                dispatch(setActiveDevice(selectedDevice));
+              }
+            }}
+          />
         </div>
       </header>
+      
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4 grid gap-6">
+          {/* Weather Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card
+            <WeatherCard
               title="Suhu"
               icon={<Thermometer className="h-4 w-4 text-gray-400" />}
-            >
-              <div className="text-2xl font-bold">
-                {sensorData.temperature}°C
-              </div>
-              <p className="text-xs text-gray-500">
-                Kelembaban: {weatherData.humidity}%
-              </p>
-            </Card>
-            <Card
+              value={`${sensorData.temperature}°C`}
+              description={`Kelembaban: ${WEATHER_DATA.humidity}%`}
+            />
+            <WeatherCard
               title="Angin"
               icon={<Wind className="h-4 w-4 text-gray-400" />}
-            >
-              <div className="text-2xl font-bold">
-                {sensorData.windSpeed} km/jam
-              </div>
-              <p className="text-xs text-gray-500">
-                Arah: {weatherData.windDirection}
-              </p>
-            </Card>
-            <Card
+              value={`${sensorData.windSpeed} km/jam`}
+              description={`Arah: ${WEATHER_DATA.windDirection}`}
+            />
+            <WeatherCard
               title="Curah Hujan"
               icon={<Droplets className="h-4 w-4 text-gray-400" />}
-            >
-              <div className="text-2xl font-bold">{sensorData.rainfall} mm</div>
-              <p className="text-xs text-gray-500">Dalam 24 jam terakhir</p>
-            </Card>
-            <Card
+              value={`${sensorData.rainfall} mm`}
+              description="Dalam 24 jam terakhir"
+            />
+            <WeatherCard
               title="Tekanan Udara"
               icon={<Gauge className="h-4 w-4 text-gray-400" />}
-            >
-              <div className="text-2xl font-bold">
-                {sensorData.pressure} hPa
-              </div>
-              <p className="text-xs text-gray-500">
-                Tinggi Pasang: {weatherData.tideLevel} m
-              </p>
-            </Card>
+              value={`${sensorData.pressure} hPa`}
+              description={`Tinggi Pasang: ${WEATHER_DATA.tideLevel} m`}
+            />
           </div>
+          
+          {/* Forecast and Alerts */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg font-semibold mb-4">Prakiraan Cuaca</h3>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={forecastData}>
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="temp" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <ForecastChart />
             </div>
             <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg font-semibold mb-2">Peringatan Dini</h3>
@@ -119,65 +98,25 @@ export default function MiniweatherDashboard() {
               </Alert>
             </div>
           </div>
+          
+          {/* Historical Data and Additional Info */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg font-semibold mb-2">Data Historis</h3>
               <p className="text-sm text-gray-500 mb-4">
                 Data suhu per menit (24 jam terakhir)
               </p>
-              <ResponsiveContainer width="100%" height={350}>
-                <LineChart data={historicalData}>
-                  <XAxis
-                    dataKey="timestamp"
-                    tickFormatter={(timeStr) =>
-                      new Date(timeStr).toLocaleTimeString("id-ID", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    }
-                    minTickGap={20}
-                  />
-                  <YAxis />
-                  <Tooltip
-                    labelFormatter={(label) =>
-                      new Date(label).toLocaleTimeString("id-ID", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    }
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="temperature"
-                    stroke="#8884d8"
-                  />
-                  <Line type="monotone" dataKey="windSpeed" stroke="#82ca9d" />
-                  <Line type="monotone" dataKey="rainfall" stroke="#ffc658" />
-                  <Line type="monotone" dataKey="pressure" stroke="#ff7300" />
-                </LineChart>
-              </ResponsiveContainer>
+              <HistoricalChart data={historicalData} />
             </div>
-
+            
             <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg font-semibold mb-4">Informasi Tambahan</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Kualitas Udara</span>
-                  <Badge>Baik</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Indeks UV</span>
-                  <Badge variant="outline">Sedang</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Visibilitas</span>
-                  <span className="text-sm">10 km</span>
-                </div>
-              </div>
+              <AdditionalInfo />
             </div>
           </div>
         </div>
       </main>
+      
       <footer className="border-t bg-white">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <p className="text-sm text-gray-500">
