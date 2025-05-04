@@ -15,7 +15,7 @@ export default function useSensorHistory() {
 
       try {
         const response = await fetch(
-          `http://localhost:3000/v1/weather-data?interval=minute&timezone=Asia/Jakarta&endTime=${endTime}&startTime=${startTime}`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/weather-data?interval=minute&timezone=Asia/Jakarta&endTime=${endTime}&startTime=${startTime}`
         );
 
         const result = await response.json();

@@ -10,7 +10,7 @@ export default function useSensorSocket() {
 
   useEffect(() => {
     console.log("Connecting to sensor socket server");
-    socket = io("http://localhost:3000");
+    socket = io(process.env.NEXT_PUBLIC_API_BASE_URL);
 
     socket.on("sensorData", async (data) => {
       try {

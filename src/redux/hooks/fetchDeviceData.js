@@ -8,7 +8,7 @@ export default function useDeviceData() {
   useEffect(() => {
     const fetchDevice = async () => {
       try {
-        const response = await fetch("http://localhost:3000/v1/onboarding-device");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/onboarding-device`);
 
         const result = await response.json();
 
