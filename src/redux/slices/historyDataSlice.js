@@ -22,7 +22,6 @@ const sensorHistoryDataSlice = createSlice({
       } else {
         console.error("Invalid historical sensor data:", data);
       }
-      console.log("Sensor history data updated:", state.historyData);
     },
   },
 });

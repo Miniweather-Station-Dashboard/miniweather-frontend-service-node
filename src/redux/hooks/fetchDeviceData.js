@@ -12,7 +12,6 @@ export default function useDeviceData() {
 
         const result = await response.json();
 
-        console.log("Device data:", result);    
         if (result.status === "success") {
           let deviceList = [];
 

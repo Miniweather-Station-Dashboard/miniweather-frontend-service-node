@@ -9,7 +9,6 @@ export default function useSensorSocket() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log("Connecting to sensor socket server");
     socket = io(process.env.NEXT_PUBLIC_API_BASE_URL);
 
     socket.on("sensorData", async (data) => {
