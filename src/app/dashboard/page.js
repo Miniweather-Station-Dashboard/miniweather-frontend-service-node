@@ -1,27 +1,15 @@
 "use client";
 
 import { useDispatch, useSelector } from "react-redux";
-import { Droplets, Gauge, Thermometer, Wind } from "lucide-react";
+import { Thermometer } from "lucide-react";
 import { Alert, Select } from "../../components/Atom";
-import useSensorSocket from "@/redux/hooks/useSensorSocket";
 import useSensorHistory from "@/redux/hooks/fetchHistoryData";
 import AdditionalInfo from "@/components/AdditionalInfo";
 import ForecastChart from "@/components/ForecastChart";
 import HistoricalChart from "@/components/HistoricalChart";
 import WeatherCard from "@/components/WeatherCard";
 import { setActiveDeviceAsync } from "@/redux/slices/deviceSlice";
-import { useEffect } from "react";
 
-// Constants
-const WEATHER_DATA = {
-  temperature: 28,
-  humidity: 75,
-  windSpeed: 15,
-  windDirection: "SE",
-  pressure: 1008,
-  rainfall: 0,
-  tideLevel: 1.2,
-};
 
 export default function MiniweatherDashboard() {
   const dispatch = useDispatch();

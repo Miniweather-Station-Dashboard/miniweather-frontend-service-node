@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { setSensorMetadata } from "./sensorSlice";
+import { resetSensorData, setSensorMetadata } from "./sensorSlice";
 import  { initializeSensorSocket } from "../hooks/useSensorSocket";
 
 export const setActiveDeviceAsync = createAsyncThunk(
@@ -13,6 +13,7 @@ export const setActiveDeviceAsync = createAsyncThunk(
 
       const deviceData = response.data.data.device;
       if (deviceData.sensors) {
+        dispatch(resetSensorData());
         dispatch(setSensorMetadata(deviceData.sensors));
         initializeSensorSocket(deviceData.id, dispatch);     }
 
