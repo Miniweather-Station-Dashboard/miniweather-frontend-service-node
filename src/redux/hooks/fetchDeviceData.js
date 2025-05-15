@@ -1,40 +1,48 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setActiveDevice, setDeviceList } from "../slices/deviceSlice";
+import {
+  setActiveDeviceAsync,
+  setDeviceList,
+  setStatus,
+  setError,
+} from "../slices/deviceSlice";
+
+export async function fetchDevice(dispatch) {
+  dispatch(setStatus("loading"));
+  dispatch(setError(null));
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/onboarding-device`
+    );
+    const result = await response.json();
+
+    if (result.status === "success") {
+      let deviceList = [];
+
+      if (Array.isArray(result.data.devices)) {
+        deviceList = result.data.devices;
+      } else if (result.data.device) {
+        deviceList = [result.data.device];
+      }
+
+      dispatch(setDeviceList(deviceList));
+      dispatch(setActiveDeviceAsync(deviceList[0] || null));
+      dispatch(setStatus("succeeded"));
+    } else {
+      dispatch(setError(result.message || "Unknown error"));
+      dispatch(setStatus("failed"));
+    }
+  } catch (error) {
+    dispatch(setError(error.message || "Failed to fetch devices"));
+    dispatch(setStatus("failed"));
+  }
+}
 
 export default function useDeviceData() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchDevice = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/onboarding-device`);
-
-        const result = await response.json();
-
-        if (result.status === "success") {
-          let deviceList = [];
-
-          if (Array.isArray(result.data.devices)) {
-            deviceList = result.data.devices;
-          } else if (result.data.device) {
-            deviceList = [result.data.device];
-          }
-
-          if (deviceList.length > 0) {
-            dispatch(setDeviceList(deviceList));
-            dispatch(setActiveDevice(deviceList[0])); 
-          } else {
-            console.warn("Device list is empty");
-          }
-        } else {
-          console.error("Failed to fetch devices:", result.message);
-        }
-      } catch (error) {
-        console.error("Error fetching devices:", error);
-      }
-    };
-
-    fetchDevice();
+    fetchDevice(dispatch);
   }, [dispatch]);
 }

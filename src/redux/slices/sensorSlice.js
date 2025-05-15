@@ -1,10 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  temperature: 0,
-  windSpeed: 0,
-  rainfall: 0,
-  pressure: 0,
+  sensors: [], // Array of { name, unit, description }
+  values: {}, // { [sensorName]: value }
   timestamp: null,
 };
 
@@ -12,29 +10,44 @@ const sensorSlice = createSlice({
   name: "sensor",
   initialState,
   reducers: {
+    setSensorMetadata: (state, action) => {
+      state.sensors = action.payload;
+      console.log("Sensor metadata set:", action.payload);
+    },
     setSensorData: (state, action) => {
-      const { temperature, wind_speed, rainfall, pressure, timestamp } =
-        action.payload;
+      const serializableData = action.payload;
 
-      // Validate the data
-      if (
-        typeof temperature === "number" &&
-        typeof wind_speed === "number" &&
-        typeof rainfall === "number" &&
-        typeof pressure === "number" 
-        // typeof timestamp === "number"
-      ) {
-        state.temperature = parseFloat(temperature.toFixed(2));
-        state.windSpeed = parseFloat(wind_speed.toFixed(2));
-        state.rainfall = parseFloat(rainfall.toFixed(2));
-        state.pressure = parseFloat(pressure.toFixed(2));
-        state.timestamp = timestamp;
-      } else {
-        console.error("Invalid sensor data received:", action.payload);
+      if (!serializableData || typeof serializableData !== "object") {
+        return;
       }
+
+      const { data, timestamp } = serializableData;
+
+      if (!data || typeof data !== "object") {
+        return;
+      }
+
+      state.sensors.forEach((sensor) => {
+        const name = sensor.name;
+        const rawValue = data[name];
+
+        if (typeof rawValue === "number") {
+          const fixedValue = parseFloat(rawValue.toFixed(2));
+          state.values[name] = fixedValue;
+        }
+      });
+
+      state.timestamp = timestamp || new Date().toISOString();
+      console.log('Updated sensor values:', state.values); // Add this
+  console.log('Updated timestamp:', state.timestamp);
+    },
+    resetSensorData: (state) => {
+      state.values = {};
+      state.timestamp = null;
     },
   },
 });
 
-export const { setSensorData } = sensorSlice.actions;
+export const { setSensorMetadata, setSensorData, resetSensorData } =
+  sensorSlice.actions;
 export default sensorSlice.reducer;

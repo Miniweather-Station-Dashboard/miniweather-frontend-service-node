@@ -5,35 +5,69 @@ import io from "socket.io-client";
 
 let socket;
 
-export default function useSensorSocket() {
+export async function initializeSensorSocket(deviceId, dispatch) {
+  if (!deviceId) return;
+
+  if (socket) {
+    socket.disconnect(); // cleanup previous socket if any
+  }
+
+  socket = io(process.env.NEXT_PUBLIC_API_BASE_URL);
+
+  socket.on("connect", () => {
+    console.log("Connected to socket");
+    socket.emit("subscribe", `devices/${deviceId}`);
+  });
+  console.log("Subscribing to devices: ", `/devices/${deviceId}`);
+
+  socket.on(`/devices/${deviceId}`, (incomingData) => {
+    try {
+      let serializableData;
+
+      if (incomingData instanceof ArrayBuffer) {
+        const textDecoder = new TextDecoder("utf-8");
+        const jsonString = textDecoder.decode(incomingData);
+        serializableData = JSON.parse(jsonString);
+      } else if (typeof incomingData === "string") {
+        serializableData = JSON.parse(incomingData);
+      } else if (typeof incomingData === "object") {
+        serializableData = JSON.parse(JSON.stringify(incomingData));
+      } else {
+        throw new Error("Unsupported data format");
+      }
+
+      dispatch(
+        setSensorData({
+          data: serializableData.data,
+          timestamp: serializableData.timestamp,
+        })
+      );
+    } catch (error) {
+      console.error("Error processing sensor data:", error);
+    }
+  });
+}
+
+function cleanupSensorSocket(deviceId) {
+  if (socket) {
+    socket.emit("unsubscribe", `devices/${deviceId}`);
+    socket.disconnect();
+    socket = null;
+  }
+}
+
+export default function useSensorData(deviceId) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    socket = io(process.env.NEXT_PUBLIC_API_BASE_URL);
+    if (deviceId) {
+      initializeSensorSocket(deviceId, dispatch);
+    }
 
-    socket.on("sensorData", async (data) => {
-      try {
-        let serializableData;
-    
-        if (data instanceof ArrayBuffer) {
-          const textDecoder = new TextDecoder("utf-8");
-          const jsonString = textDecoder.decode(data);
-          serializableData = JSON.parse(jsonString).data;
-        } else if (typeof data === "string") {
-          serializableData = JSON.parse(data).data;
-        } else {
-          serializableData = data.data;
-        }    
-        dispatch(setSensorData(serializableData));
-      } catch (error) {
-        console.error("Error processing sensor data:", error);
-      }
-    });
-    
     return () => {
-      if (socket) {
-        socket.disconnect();
+      if (deviceId) {
+        cleanupSensorSocket(deviceId);
       }
     };
-  }, [dispatch]);
+  }, [deviceId, dispatch]);
 }

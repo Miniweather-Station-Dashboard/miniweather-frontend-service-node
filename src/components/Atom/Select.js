@@ -1,7 +1,12 @@
 import { ChevronDown } from "lucide-react";
-const Select = ({ options }) => (
+
+const Select = ({ value, onChange, options }) => (
   <div className="relative">
-    <select className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    >
       {options.map((option) => (
         <option key={option} value={option}>
           {option}

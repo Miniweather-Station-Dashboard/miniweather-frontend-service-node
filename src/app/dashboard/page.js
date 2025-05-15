@@ -9,7 +9,8 @@ import AdditionalInfo from "@/components/AdditionalInfo";
 import ForecastChart from "@/components/ForecastChart";
 import HistoricalChart from "@/components/HistoricalChart";
 import WeatherCard from "@/components/WeatherCard";
-import { setActiveDevice } from "@/redux/slices/deviceSlice";
+import { setActiveDeviceAsync } from "@/redux/slices/deviceSlice";
+import { useEffect } from "react";
 
 // Constants
 const WEATHER_DATA = {
@@ -24,10 +25,10 @@ const WEATHER_DATA = {
 
 export default function MiniweatherDashboard() {
   const dispatch = useDispatch();
-  useSensorSocket();
   useSensorHistory();
-  
-  const historicalData = useSelector((state) => state.sensorHistoryData?.historyData) || [];
+
+  const historicalData =
+    useSelector((state) => state.sensorHistoryData?.historyData) || [];
   const sensorData = useSelector((state) => state.sensor);
   const deviceList = useSelector((state) => state.device.deviceList) || [];
   const activeDevice = useSelector((state) => state.device.activeDevice);
@@ -45,43 +46,32 @@ export default function MiniweatherDashboard() {
                 (d) => d.name === selectedName
               );
               if (selectedDevice) {
-                dispatch(setActiveDevice(selectedDevice));
+                dispatch(setActiveDeviceAsync(selectedDevice));
               }
             }}
           />
         </div>
       </header>
-      
+
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4 grid gap-6">
           {/* Weather Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <WeatherCard
-              title="Suhu"
-              icon={<Thermometer className="h-4 w-4 text-gray-400" />}
-              value={`${sensorData.temperature}°C`}
-              description={`Kelembaban: ${WEATHER_DATA.humidity}%`}
-            />
-            <WeatherCard
-              title="Angin"
-              icon={<Wind className="h-4 w-4 text-gray-400" />}
-              value={`${sensorData.windSpeed} km/jam`}
-              description={`Arah: ${WEATHER_DATA.windDirection}`}
-            />
-            <WeatherCard
-              title="Curah Hujan"
-              icon={<Droplets className="h-4 w-4 text-gray-400" />}
-              value={`${sensorData.rainfall} mm`}
-              description="Dalam 24 jam terakhir"
-            />
-            <WeatherCard
-              title="Tekanan Udara"
-              icon={<Gauge className="h-4 w-4 text-gray-400" />}
-              value={`${sensorData.pressure} hPa`}
-              description={`Tinggi Pasang: ${WEATHER_DATA.tideLevel} m`}
-            />
+            {sensorData.sensors?.map((sensor, index) => {
+              const value = sensorData.values?.[sensor.name] ?? "-";
+              const unit = sensor.unit || "";
+              return (
+                <WeatherCard
+                  key={sensor.name}
+                  title={sensor.name}
+                  icon={<Thermometer className="h-4 w-4 text-gray-400" />} 
+                  value={`${value} ${unit}`}
+                  description={sensor.description}
+                />
+              );
+            })}
           </div>
-          
+
           {/* Forecast and Alerts */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
@@ -98,7 +88,7 @@ export default function MiniweatherDashboard() {
               </Alert>
             </div>
           </div>
-          
+
           {/* Historical Data and Additional Info */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
@@ -108,7 +98,7 @@ export default function MiniweatherDashboard() {
               </p>
               <HistoricalChart data={historicalData} />
             </div>
-            
+
             <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg font-semibold mb-4">Informasi Tambahan</h3>
               <AdditionalInfo />
@@ -116,7 +106,7 @@ export default function MiniweatherDashboard() {
           </div>
         </div>
       </main>
-      
+
       <footer className="border-t bg-white">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <p className="text-sm text-gray-500">
