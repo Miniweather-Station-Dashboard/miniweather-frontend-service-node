@@ -45,18 +45,9 @@ export default function MiniweatherDashboard() {
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4 grid gap-6">
           {/* Waktu Lokal */}
-          <section>
-            <h2 className="text-xl font-semibold mb-4">Waktu Lokal</h2>
+          <section className="md:flex items-center justify-between gap-4">
             <LocalTimeClock />
-          </section>
-
-          <hr className="my-6 border-gray-300" />
-
-          {/* Peta Lokasi Perangkat */}
-          <section>
-            <h2 className="text-xl font-semibold mb-4">
-              Peta Lokasi Perangkat
-            </h2>
+    
             <DeviceMap />
           </section>
 

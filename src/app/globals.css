@@ -26,3 +26,12 @@
     box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
   }
 }
+
+:root {
+  --font-poppins: 'Poppins', sans-serif;
+}
+
+body {
+  font-family: var(--font-poppins);
+}
+

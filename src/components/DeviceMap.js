@@ -19,7 +19,7 @@ export default function DeviceMap() {
   const dispatch = useDispatch();
 
   return (
-    <div className="w-full h-[500px] rounded-lg overflow-hidden">
+    <div className="w-full h-[50vh] rounded-lg overflow-hidden">
       <MapContainer
         center={[-7.868215883075584, 110.34830342264677]}
         zoom={9}
