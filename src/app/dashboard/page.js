@@ -47,7 +47,7 @@ export default function MiniweatherDashboard() {
           {/* Waktu Lokal */}
           <section className="md:flex items-center justify-between gap-4">
             <LocalTimeClock />
-    
+
             <DeviceMap />
           </section>
 
@@ -56,21 +56,27 @@ export default function MiniweatherDashboard() {
           {/* Kartu Cuaca */}
           <section>
             <h2 className="text-xl font-semibold mb-4">Data Sensor Cuaca</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {sensorData.sensors?.map((sensor) => {
-                const value = sensorData.values?.[sensor.name] ?? "-";
-                const unit = sensor.unit || "";
-                return (
-                  <WeatherCard
-                    key={sensor.name}
-                    title={sensor.name}
-                    icon={<Thermometer className="h-4 w-4 text-gray-400" />}
-                    value={`${value} ${unit}`}
-                    description={sensor.description}
-                  />
-                );
-              })}
-            </div>
+            {sensorData.sensors?.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {sensorData.sensors.map((sensor) => {
+                  const value = sensorData.values?.[sensor.name] ?? "-";
+                  const unit = sensor.unit || "";
+                  return (
+                    <WeatherCard
+                      key={sensor.name}
+                      title={sensor.name}
+                      icon={<Thermometer className="h-4 w-4 text-gray-400" />}
+                      value={`${value} ${unit}`}
+                      description={sensor.description}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-gray-500 text-sm italic">
+                Tidak ada data sensor tersedia untuk perangkat ini.
+              </div>
+            )}
           </section>
 
           <hr className="my-6 border-gray-300" />
@@ -107,9 +113,6 @@ export default function MiniweatherDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-2">Data Historis</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  Data suhu per menit (24 jam terakhir)
-                </p>
                 <HistoricalChart data={historicalData} />
               </div>
 

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 
 const LocalTimeClock = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [bgImage, setBgImage] = useState("/bg_clock.png"); // default image
-
+  const [bgImage, setBgImage] = useState("/bg_day.png"); 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
