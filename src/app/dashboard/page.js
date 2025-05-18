@@ -10,7 +10,12 @@ import HistoricalChart from "@/components/HistoricalChart";
 import WeatherCard from "@/components/WeatherCard";
 import { setActiveDeviceAsync } from "@/redux/slices/deviceSlice";
 import LocalTimeClock from "@/components/LocalTimeClock";
-import DeviceMap from "@/components/DeviceMap";
+
+import dynamic from "next/dynamic";
+
+const DeviceMap = dynamic(() => import("@/components/DeviceMap"), {
+  ssr: false,
+});
 
 export default function MiniweatherDashboard() {
   const dispatch = useDispatch();
