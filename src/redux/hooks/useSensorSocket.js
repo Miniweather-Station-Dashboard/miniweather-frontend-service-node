@@ -15,10 +15,8 @@ export async function initializeSensorSocket(deviceId, dispatch) {
   socket = io(process.env.NEXT_PUBLIC_API_BASE_URL);
 
   socket.on("connect", () => {
-    console.log("Connected to socket");
     socket.emit("subscribe", `devices/${deviceId}`);
   });
-  console.log("Subscribing to devices: ", `/devices/${deviceId}`);
 
   socket.on(`/devices/${deviceId}`, (incomingData) => {
     try {

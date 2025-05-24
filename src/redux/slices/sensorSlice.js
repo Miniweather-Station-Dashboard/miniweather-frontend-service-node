@@ -12,7 +12,6 @@ const sensorSlice = createSlice({
   reducers: {
     setSensorMetadata: (state, action) => {
       state.sensors = action.payload;
-      console.log("Sensor metadata set:", action.payload);
     },
     setSensorData: (state, action) => {
       const serializableData = action.payload;
@@ -38,8 +37,6 @@ const sensorSlice = createSlice({
       });
 
       state.timestamp = timestamp || new Date().toISOString();
-      console.log('Updated sensor values:', state.values); // Add this
-  console.log('Updated timestamp:', state.timestamp);
     },
     resetSensorData: (state) => {
       state.values = {};

@@ -36,7 +36,6 @@ const deviceSlice = createSlice({
   initialState,
   reducers: {
     setDeviceList: (state, action) => {
-      console.log("setDeviceList", action.payload);
       state.deviceList = action.payload;
     },
     setStatus: (state, action) => {
