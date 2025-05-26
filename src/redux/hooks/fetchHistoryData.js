@@ -1,11 +1,14 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSensorHistoryData } from "../slices/historyDataSlice";
 
 export default function useSensorHistory() {
   const dispatch = useDispatch();
+  const activeDevice = useSelector((state) => state.device.activeDevice);
 
   useEffect(() => {
+    if (!activeDevice) return; // Only run if activeDevice exists
+
     const fetchData = async () => {
       const now = new Date();
       const endTime = now.toISOString();
@@ -15,9 +18,9 @@ export default function useSensorHistory() {
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/weather-data?interval=minute&timezone=Asia/Jakarta&endTime=${endTime}&startTime=${startTime}`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/weather-data?interval=minute&timezone=Asia/Jakarta&endTime=${endTime}&startTime=${startTime}&deviceId=${activeDevice.id}`,
         );
-
+        
         const result = await response.json();
 
         if (result.status === "success" && result.data?.data) {
@@ -31,5 +34,5 @@ export default function useSensorHistory() {
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, activeDevice]);
 }

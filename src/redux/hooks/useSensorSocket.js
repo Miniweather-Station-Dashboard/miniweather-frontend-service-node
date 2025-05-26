@@ -9,13 +9,13 @@ export async function initializeSensorSocket(deviceId, dispatch) {
   if (!deviceId) return;
 
   if (socket) {
-    socket.disconnect(); // cleanup previous socket if any
+    socket.disconnect();
   }
 
   socket = io(process.env.NEXT_PUBLIC_API_BASE_URL);
 
   socket.on("connect", () => {
-    socket.emit("subscribe", `devices/${deviceId}`);
+    socket.emit("subscribe", `/devices/${deviceId}`);
   });
 
   socket.on(`/devices/${deviceId}`, (incomingData) => {

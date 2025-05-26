@@ -1,3 +1,4 @@
+import { toSnakeCase } from "@/helper/snakeCase";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -15,7 +16,6 @@ const sensorSlice = createSlice({
     },
     setSensorData: (state, action) => {
       const serializableData = action.payload;
-
       if (!serializableData || typeof serializableData !== "object") {
         return;
       }
@@ -27,12 +27,12 @@ const sensorSlice = createSlice({
       }
 
       state.sensors.forEach((sensor) => {
-        const name = sensor.name;
-        const rawValue = data[name];
+        const snakeKey = toSnakeCase(sensor.name); 
+        const rawValue = data[snakeKey];
 
         if (typeof rawValue === "number") {
           const fixedValue = parseFloat(rawValue.toFixed(2));
-          state.values[name] = fixedValue;
+          state.values[sensor.name] = fixedValue; 
         }
       });
 
