@@ -12,20 +12,61 @@ import { setActiveDeviceAsync } from "@/redux/slices/deviceSlice";
 import LocalTimeClock from "@/components/LocalTimeClock";
 
 import dynamic from "next/dynamic";
+import { useState, useEffect, useCallback } from "react";
 
 const DeviceMap = dynamic(() => import("@/components/DeviceMap"), {
   ssr: false,
 });
 
+const formatToDatetimeLocal = (date) => {
+  if (!date) return "";
+  const pad = (num) => (num < 10 ? "0" + num : num);
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
 export default function MiniweatherDashboard() {
   const dispatch = useDispatch();
-  useSensorHistory();
-
+  const { timeRange, updateTimeRange } = useSensorHistory();
   const historicalData =
     useSelector((state) => state.sensorHistoryData?.historyData) || [];
   const sensorData = useSelector((state) => state.sensor);
   const deviceList = useSelector((state) => state.device.deviceList) || [];
   const activeDevice = useSelector((state) => state.device.activeDevice);
+  const [customStartTime, setCustomStartTime] = useState("");
+  const [customEndTime, setCustomEndTime] = useState("");
+
+  useEffect(() => {
+    if (timeRange.startTime && timeRange.endTime) {
+      setCustomStartTime(formatToDatetimeLocal(new Date(timeRange.startTime)));
+      setCustomEndTime(formatToDatetimeLocal(new Date(timeRange.endTime)));
+    }
+  }, [timeRange]);
+
+  const handleApplyCustomTimeRange = useCallback(() => {
+    if (!customStartTime || !customEndTime) {
+      alert("Please select both start and end times for historical data.");
+      return;
+    }
+    const startIso = new Date(customStartTime).toISOString();
+    const endIso = new Date(customEndTime).toISOString();
+    updateTimeRange(startIso, endIso);
+  }, [customStartTime, customEndTime, updateTimeRange]);
+
+  const handleResetTo24Hours = useCallback(() => {
+    const now = new Date();
+    const defaultEndTime = now.toISOString();
+    const defaultStartTime = new Date(
+      now.getTime() - 24 * 60 * 60 * 1000
+    ).toISOString();
+    setCustomStartTime(formatToDatetimeLocal(new Date(defaultStartTime)));
+    setCustomEndTime(formatToDatetimeLocal(new Date(defaultEndTime)));
+    updateTimeRange(defaultStartTime, defaultEndTime);
+  }, [updateTimeRange]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -49,16 +90,13 @@ export default function MiniweatherDashboard() {
 
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4 grid gap-6">
-          {/* Waktu Lokal */}
           <section className="md:flex items-center justify-between gap-4">
             <LocalTimeClock />
-
             <DeviceMap />
           </section>
 
           <hr className="my-6 border-gray-300" />
 
-          {/* Kartu Cuaca */}
           <section>
             <h2 className="text-xl font-semibold mb-4">Data Sensor Cuaca</h2>
             {sensorData.sensors?.length > 0 ? (
@@ -86,7 +124,6 @@ export default function MiniweatherDashboard() {
 
           <hr className="my-6 border-gray-300" />
 
-          {/* Prakiraan dan Peringatan */}
           <section>
             <h2 className="text-xl font-semibold mb-4">
               Prakiraan dan Peringatan Cuaca
@@ -110,7 +147,6 @@ export default function MiniweatherDashboard() {
 
           <hr className="my-6 border-gray-300" />
 
-          {/* Data Historis & Info Tambahan */}
           <section>
             <h2 className="text-xl font-semibold mb-4">
               Data Historis dan Informasi Tambahan
@@ -118,9 +154,48 @@ export default function MiniweatherDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-2">Data Historis</h3>
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <label
+                    htmlFor="historicalStartTime"
+                    className="text-sm font-medium"
+                  >
+                    From:
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="historicalStartTime"
+                    value={customStartTime}
+                    onChange={(e) => setCustomStartTime(e.target.value)}
+                    className="p-1 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <label
+                    htmlFor="historicalEndTime"
+                    className="text-sm font-medium"
+                  >
+                    To:
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="historicalEndTime"
+                    value={customEndTime}
+                    onChange={(e) => setCustomEndTime(e.target.value)}
+                    className="p-1 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    onClick={handleApplyCustomTimeRange}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+                  >
+                    Apply
+                  </button>
+                  <button
+                    onClick={handleResetTo24Hours}
+                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 text-sm"
+                  >
+                    Last 24 Hrs
+                  </button>
+                </div>
                 <HistoricalChart data={historicalData} />
               </div>
-
               <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-4">
                   Informasi Tambahan
