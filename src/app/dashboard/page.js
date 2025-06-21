@@ -13,6 +13,7 @@ import LocalTimeClock from "@/components/LocalTimeClock";
 
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
+import EarlyWarning from "@/components/EarlyWarning";
 
 const DeviceMap = dynamic(() => import("@/components/DeviceMap"), {
   ssr: false,
@@ -133,15 +134,7 @@ export default function MiniweatherDashboard() {
                 <h3 className="text-lg font-semibold mb-4">Prakiraan Cuaca</h3>
                 <ForecastChart />
               </div>
-              <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
-                <h3 className="text-lg font-semibold mb-2">Peringatan Dini</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  Status bencana terkini
-                </p>
-                <Alert title="Peringatan">
-                  Potensi gelombang tinggi dalam 24 jam ke depan.
-                </Alert>
-              </div>
+              <EarlyWarning/>
             </div>
           </section>
 
