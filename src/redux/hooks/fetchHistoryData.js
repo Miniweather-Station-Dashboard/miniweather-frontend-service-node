@@ -31,13 +31,6 @@ export default function useSensorHistory() {
 
     const fetchData = async () => {
       const { startTime, endTime } = timeRange;
-
-      console.log("Fetching sensor history with:", {
-        deviceId: activeDevice.id,
-        startTime,
-        endTime,
-      });
-
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/weather-data?interval=minute&timezone=Asia/Jakarta&endTime=${endTime}&startTime=${startTime}&deviceId=${activeDevice.id}`,
