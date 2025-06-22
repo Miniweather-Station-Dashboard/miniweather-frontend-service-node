@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import { Thermometer } from "lucide-react";
-import { Alert, Select } from "../../components/Atom";
+import { Select } from "../../components/Atom";
 import useSensorHistory from "@/redux/hooks/fetchHistoryData";
 import AdditionalInfo from "@/components/AdditionalInfo";
 import ForecastChart from "@/components/ForecastChart";
@@ -14,6 +14,7 @@ import LocalTimeClock from "@/components/LocalTimeClock";
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
 import EarlyWarning from "@/components/EarlyWarning";
+import ArticleCarousel from "@/components/ArticleCarousel";
 
 const DeviceMap = dynamic(() => import("@/components/DeviceMap"), {
   ssr: false,
@@ -40,7 +41,7 @@ export default function MiniweatherDashboard() {
   const activeDevice = useSelector((state) => state.device.activeDevice);
   const [customStartTime, setCustomStartTime] = useState("");
   const [customEndTime, setCustomEndTime] = useState("");
-
+ 
   useEffect(() => {
     if (timeRange.startTime && timeRange.endTime) {
       setCustomStartTime(formatToDatetimeLocal(new Date(timeRange.startTime)));
@@ -89,7 +90,7 @@ export default function MiniweatherDashboard() {
         </div>
       </header>
 
-      <main className="flex-1 py-8">
+      <main className="flex-1 py-8 w-[100vw]">
         <div className="container mx-auto px-4 grid gap-6">
           <section className="md:flex items-center justify-between gap-4">
             <LocalTimeClock />
@@ -122,6 +123,12 @@ export default function MiniweatherDashboard() {
               </div>
             )}
           </section>
+          <section>
+            <hr className="my-6 border-gray-300" />
+            <div className="mt-8">
+              <ArticleCarousel />
+            </div>
+          </section>
 
           <hr className="my-6 border-gray-300" />
 
@@ -134,7 +141,7 @@ export default function MiniweatherDashboard() {
                 <h3 className="text-lg font-semibold mb-4">Prakiraan Cuaca</h3>
                 <ForecastChart />
               </div>
-              <EarlyWarning/>
+              <EarlyWarning />
             </div>
           </section>
 
