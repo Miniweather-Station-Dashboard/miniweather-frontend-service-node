@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
 import EarlyWarning from "@/components/EarlyWarning";
 import ArticleCarousel from "@/components/ArticleCarousel";
+import ArticleSearch from "@/components/ArticleSearch";
 
 const DeviceMap = dynamic(() => import("@/components/DeviceMap"), {
   ssr: false,
@@ -41,7 +42,7 @@ export default function MiniweatherDashboard() {
   const activeDevice = useSelector((state) => state.device.activeDevice);
   const [customStartTime, setCustomStartTime] = useState("");
   const [customEndTime, setCustomEndTime] = useState("");
- 
+
   useEffect(() => {
     if (timeRange.startTime && timeRange.endTime) {
       setCustomStartTime(formatToDatetimeLocal(new Date(timeRange.startTime)));
@@ -124,32 +125,8 @@ export default function MiniweatherDashboard() {
             )}
           </section>
           <section>
-            <hr className="my-6 border-gray-300" />
-            <div className="mt-8">
-              <ArticleCarousel />
-            </div>
-          </section>
-
-          <hr className="my-6 border-gray-300" />
-
-          <section>
             <h2 className="text-xl font-semibold mb-4">
               Prakiraan dan Peringatan Cuaca
-            </h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
-                <h3 className="text-lg font-semibold mb-4">Prakiraan Cuaca</h3>
-                <ForecastChart />
-              </div>
-              <EarlyWarning />
-            </div>
-          </section>
-
-          <hr className="my-6 border-gray-300" />
-
-          <section>
-            <h2 className="text-xl font-semibold mb-4">
-              Data Historis dan Informasi Tambahan
             </h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
@@ -196,6 +173,34 @@ export default function MiniweatherDashboard() {
                 </div>
                 <HistoricalChart data={historicalData} />
               </div>
+
+              <EarlyWarning />
+            </div>
+          </section>
+
+          <hr className="my-6 border-gray-300" />
+          <section>
+            <div className="mt-8">
+              <ArticleCarousel />
+            </div>
+            <div className="mt-8">
+              <ArticleSearch />
+            </div>
+          </section>
+
+          <hr className="my-6 border-gray-300" />
+
+          
+
+          {/* <section>
+            <h2 className="text-xl font-semibold mb-4">
+              Data Historis dan Informasi Tambahan
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold mb-4">Prakiraan Cuaca</h3>
+                <ForecastChart />
+              </div>
               <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
                 <h3 className="text-lg font-semibold mb-4">
                   Informasi Tambahan
@@ -203,7 +208,7 @@ export default function MiniweatherDashboard() {
                 <AdditionalInfo />
               </div>
             </div>
-          </section>
+          </section> */}
         </div>
       </main>
 

@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  articles: [],
-  loading: "idle", // 'idle' | 'pending' | 'succeeded' | 'failed'
+  articles: [], 
+  searchResults: [], 
+  loading: "idle",
+  searchLoading: "idle",
   error: null,
 };
 
@@ -13,13 +15,21 @@ const articleSlice = createSlice({
     setArticles: (state, action) => {
       state.articles = action.payload;
     },
+    setSearchResults: (state, action) => {
+      state.searchResults = action.payload;
+    },
     clearArticles: (state) => {
       state.articles = [];
+      state.searchResults = [];
       state.loading = "idle";
+      state.searchLoading = "idle";
       state.error = null;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
+    },
+    setSearchLoading: (state, action) => {
+      state.searchLoading = action.payload;
     },
     setError: (state, action) => {
       state.error = action.payload;
@@ -27,7 +37,13 @@ const articleSlice = createSlice({
   },
 });
 
-export const { setArticles, clearArticles, setLoading, setError } =
-  articleSlice.actions;
+export const {
+  setArticles,
+  setSearchResults,
+  clearArticles,
+  setLoading,
+  setSearchLoading,
+  setError,
+} = articleSlice.actions;
 
 export default articleSlice.reducer;
