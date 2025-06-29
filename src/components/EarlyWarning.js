@@ -30,7 +30,7 @@ const EarlyWarning = () => {
 
   if (warnings.length === 0) {
     return (
-      <div className=" bg-white rounded-lg shadow-md p-4">
+      <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
         <h3 className="text-lg font-semibold mb-2">Peringatan Dini</h3>
         <p className="text-sm text-gray-500 mb-4">Status bencana terkini</p>
         <p className="text-gray-500 text-sm italic">
