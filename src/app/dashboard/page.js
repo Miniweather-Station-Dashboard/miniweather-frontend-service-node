@@ -55,8 +55,17 @@ export default function MiniweatherDashboard() {
       alert("Please select both start and end times for historical data.");
       return;
     }
-    const startIso = new Date(customStartTime).toISOString();
-    const endIso = new Date(customEndTime).toISOString();
+
+    const start = new Date(customStartTime);
+    const end = new Date(customEndTime);
+
+    if (start >= end) {
+      alert('"From" time must be earlier than "To" time.');
+      return;
+    }
+
+    const startIso = start.toISOString();
+    const endIso = end.toISOString();
     updateTimeRange(startIso, endIso);
   }, [customStartTime, customEndTime, updateTimeRange]);
 
@@ -141,6 +150,7 @@ export default function MiniweatherDashboard() {
                   <input
                     type="datetime-local"
                     id="historicalStartTime"
+                    max={formatToDatetimeLocal(new Date())}
                     value={customStartTime}
                     onChange={(e) => setCustomStartTime(e.target.value)}
                     className="p-1 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
@@ -154,16 +164,29 @@ export default function MiniweatherDashboard() {
                   <input
                     type="datetime-local"
                     id="historicalEndTime"
+                    max={formatToDatetimeLocal(new Date())}
                     value={customEndTime}
                     onChange={(e) => setCustomEndTime(e.target.value)}
                     className="p-1 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                   />
                   <button
                     onClick={handleApplyCustomTimeRange}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+                    disabled={
+                      !customStartTime ||
+                      !customEndTime ||
+                      new Date(customStartTime) >= new Date(customEndTime)
+                    }
+                    className={`px-4 py-2 text-white rounded-md text-sm ${
+                      !customStartTime ||
+                      !customEndTime ||
+                      new Date(customStartTime) >= new Date(customEndTime)
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-500 hover:bg-blue-600"
+                    }`}
                   >
                     Apply
                   </button>
+
                   <button
                     onClick={handleResetTo24Hours}
                     className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 text-sm"
@@ -189,8 +212,6 @@ export default function MiniweatherDashboard() {
           </section>
 
           <hr className="my-6 border-gray-300" />
-
-          
 
           {/* <section>
             <h2 className="text-xl font-semibold mb-4">

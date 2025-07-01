@@ -10,6 +10,7 @@ import {
   Line,
   LineChart,
 } from "recharts";
+import { useEffect, useState } from "react";
 
 const colorPalette = [
   "#8884d8",
@@ -28,45 +29,78 @@ const HistoricalChart = ({ data }) => {
   const sensorsReady =
     Array.isArray(sensorData?.sensors) && sensorData.sensors.length > 0;
 
+  const [selectedSensors, setSelectedSensors] = useState([]);
+
+  useEffect(() => {
+    if (sensorsReady && selectedSensors.length === 0) {
+      setSelectedSensors(sensorData.sensors.map((s) => s.name));
+    }
+  }, [sensorData.sensors]);
+
+  const handleToggleSensor = (sensorName) => {
+    setSelectedSensors((prevSelected) =>
+      prevSelected.includes(sensorName)
+        ? prevSelected.filter((s) => s !== sensorName)
+        : [...prevSelected, sensorName]
+    );
+  };
+
   return (
-    <div className="h-[350px] flex items-center justify-center bg-white rounded-md">
-      {!sensorsReady || isEmpty ? (
-        <p className="text-gray-500 italic">Data historis tidak tersedia.</p>
-      ) : (
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
-            <XAxis
-              dataKey="timestamp"
-              tickFormatter={(timeStr) =>
-                new Date(timeStr).toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              }
-              minTickGap={20}
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2 p-2">
+        {sensorData.sensors?.map((sensor) => (
+          <label key={sensor.name} className="text-sm flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={selectedSensors.includes(sensor.name)}
+              onChange={() => handleToggleSensor(sensor.name)}
             />
-            <YAxis />
-            <Tooltip
-              labelFormatter={(label) =>
-                new Date(label).toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              }
-            />
-            {sensorData.sensors?.map((sensor, idx) => (
-              <Line
-                key={sensor.name}
-                type="monotone"
-                dataKey={toSnakeCase(sensor.name)}
-                stroke={colorPalette[idx % colorPalette.length]}
-                name={sensor.name}
-                unit={sensor.unit}
+            {sensor.name}
+          </label>
+        ))}
+      </div>
+
+      <div className="h-[350px] flex items-center justify-center bg-white rounded-md">
+        {!sensorsReady || isEmpty ? (
+          <p className="text-gray-500 italic">Data historis tidak tersedia.</p>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data}>
+              <XAxis
+                dataKey="timestamp"
+                tickFormatter={(timeStr) =>
+                  new Date(timeStr).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                }
+                minTickGap={20}
               />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
-      )}
+              <YAxis />
+              <Tooltip
+                labelFormatter={(label) =>
+                  new Date(label).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                }
+              />
+              {sensorData.sensors
+                .filter((sensor) => selectedSensors.includes(sensor.name))
+                .map((sensor, idx) => (
+                  <Line
+                    key={sensor.name}
+                    type="monotone"
+                    dataKey={toSnakeCase(sensor.name)}
+                    stroke={colorPalette[idx % colorPalette.length]}
+                    name={sensor.name}
+                    unit={sensor.unit}
+                  />
+                ))}
+            </LineChart>
+          </ResponsiveContainer>
+        )}
+      </div>
     </div>
   );
 };
