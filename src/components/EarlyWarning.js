@@ -32,7 +32,7 @@ const EarlyWarning = () => {
     return (
       <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-4">
         <h3 className="text-lg font-semibold mb-2">Peringatan Dini</h3>
-        <p className="text-sm text-gray-500 mb-4">Status bencana terkini</p>
+        <p className="text-sm text-gray-500 mb-4">Peringatan ini penting</p>
         <p className="text-gray-500 text-sm italic">
           Tidak ada peringatan dini aktif saat ini.
         </p>
@@ -50,6 +50,7 @@ const EarlyWarning = () => {
             key={warning.id}
             type={warning.type}
             title={warning.type.charAt(0).toUpperCase() + warning.type.slice(1)}
+            lastUpdated={warning.updatedAt}
           >
             {warning.message}
           </Alert>

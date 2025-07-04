@@ -135,7 +135,7 @@ export default function MiniweatherDashboard() {
           </section>
           <section>
             <h2 className="text-xl font-semibold mb-4">
-              Prakiraan dan Peringatan Cuaca
+              Data dan Peringatan Cuaca
             </h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <div className="lg:col-span-4 bg-white rounded-lg shadow-md p-4">

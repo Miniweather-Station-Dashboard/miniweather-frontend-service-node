@@ -18,32 +18,32 @@ export async function initializeSensorSocket(deviceId, dispatch) {
     socket.emit("subscribe", `/devices/${deviceId}`);
   });
 
-  socket.on(`/devices/${deviceId}`, (incomingData) => {
-    try {
-      let serializableData;
+socket.on(`/devices/${deviceId}`, (incomingData) => {
+  try {
+    let serializableData;
 
-      if (incomingData instanceof ArrayBuffer) {
-        const textDecoder = new TextDecoder("utf-8");
-        const jsonString = textDecoder.decode(incomingData);
-        serializableData = JSON.parse(jsonString);
-      } else if (typeof incomingData === "string") {
-        serializableData = JSON.parse(incomingData);
-      } else if (typeof incomingData === "object") {
-        serializableData = JSON.parse(JSON.stringify(incomingData));
-      } else {
-        throw new Error("Unsupported data format");
-      }
-
-      dispatch(
-        setSensorData({
-          data: serializableData.data,
-          timestamp: serializableData.timestamp,
-        })
-      );
-    } catch (error) {
-      console.error("Error processing sensor data:", error);
+    if (incomingData instanceof ArrayBuffer) {
+      const textDecoder = new TextDecoder("utf-8");
+      const jsonString = textDecoder.decode(incomingData);
+      serializableData = JSON.parse(jsonString);
+    } else if (typeof incomingData === "string") {
+      serializableData = JSON.parse(incomingData);
+    } else if (typeof incomingData === "object") {
+      serializableData = JSON.parse(JSON.stringify(incomingData));
+    } else {
+      throw new Error("Unsupported data format");
     }
-  });
+
+    dispatch(
+      setSensorData({
+        data: serializableData.data,
+        timestamp: serializableData.timestamp, 
+      })
+    );
+  } catch (error) {
+    console.error("Error processing sensor data:", error);
+  }
+});
 }
 
 function cleanupSensorSocket(deviceId) {

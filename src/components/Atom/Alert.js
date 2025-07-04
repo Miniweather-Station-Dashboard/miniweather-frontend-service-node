@@ -1,5 +1,4 @@
-
-const Alert = ({ title, children, type = 'general' }) => {
+const Alert = ({ title, children, type = 'general', lastUpdated }) => {
   const colorClasses = {
     weather: "bg-blue-100 border-blue-500 text-blue-700",
     earthquake: "bg-red-100 border-red-500 text-red-700",
@@ -17,6 +16,11 @@ const Alert = ({ title, children, type = 'general' }) => {
     >
       <p className="font-bold">{title}</p>
       <p>{children}</p>
+      {lastUpdated && (
+        <p className="mt-2 text-sm italic opacity-70">
+          Diperbarui terakhir: {new Date(lastUpdated).toLocaleString()}
+        </p>
+      )}
     </div>
   );
 };

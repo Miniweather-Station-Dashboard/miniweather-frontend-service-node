@@ -25,7 +25,6 @@ export default function useSensorHistory() {
 
   useEffect(() => {
     if (!activeDevice || !timeRange.startTime || !timeRange.endTime) {
-      console.log("Skipping fetch: No active device or missing time range.", { activeDevice, timeRange });
       return;
     }
 
