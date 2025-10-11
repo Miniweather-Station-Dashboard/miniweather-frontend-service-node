@@ -1,12 +1,12 @@
 // hooks/useWarningData.ts
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import {
   setWarnings,
   setLoading,
   setError,
   setPagination,
 } from "../slices/warningSlice";
+import { useAppDispatch } from "./helper";
 
 /**
  * Fetch warnings with server-side pagination.
@@ -89,7 +89,7 @@ export async function fetchWarningData(dispatch, params = {}) {
  * @example useWarningData({ page, limit, type, sort })
  */
 export default function useWarningData(params = {}) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const controller = new AbortController();

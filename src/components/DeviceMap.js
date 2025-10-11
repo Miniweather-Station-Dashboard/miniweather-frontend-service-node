@@ -1,10 +1,10 @@
 "use client";
 
-import { useDispatch, useSelector } from "react-redux";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { setActiveDeviceAsync } from "@/redux/slices/deviceSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/helper";
 
 // Remove the default Leaflet icon images
 delete L.Icon.Default.prototype._getIconUrl;
@@ -15,8 +15,8 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function DeviceMap() {
-  const deviceList = useSelector((state) => state.device.deviceList) || [];
-  const dispatch = useDispatch();
+  const deviceList = useAppSelector((state) => state.device.deviceList) || [];
+  const dispatch = useAppDispatch();
 
   return (
     <div className="w-full h-[50vh] rounded-lg overflow-hidden">

@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import ArticleCard from "@/components/Atom/ArticleCard";
 import {
   setSearchResults,
   setSearchLoading,
   setError,
 } from "@/redux/slices/articleSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/helper";
 
 export default function ArticleSearch() {
-  const dispatch = useDispatch();
-  const articles = useSelector((state) => state.article.searchResults);
-  const loading = useSelector((state) => state.article.searchLoading);
+  const dispatch = useAppDispatch();
+  const articles = useAppSelector((state) => state.article.searchResults);
+  const loading = useAppSelector((state) => state.article.searchLoading);
 
   const [query, setQuery] = useState("");
 

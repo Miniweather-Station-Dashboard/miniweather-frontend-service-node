@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { setSensorData } from "../slices/sensorSlice";
 import io from "socket.io-client";
+import { useAppDispatch } from "./helper";
 
 let socket;
 
@@ -55,7 +55,7 @@ function cleanupSensorSocket(deviceId) {
 }
 
 export default function useSensorData(deviceId) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (deviceId) {

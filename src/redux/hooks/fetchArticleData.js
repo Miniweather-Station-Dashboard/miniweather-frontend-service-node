@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { setArticles, setLoading, setError } from "../slices/articleSlice";
+import { useAppDispatch } from "./helper";
 
 /**
  * Async function to fetch warning data from the backend.
@@ -41,7 +41,7 @@ export async function fetchArticleData(dispatch) {
  * It dispatches the action to fetch articles via Redux.
  */
 export default function useArticleData() {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         fetchArticleData(dispatch);

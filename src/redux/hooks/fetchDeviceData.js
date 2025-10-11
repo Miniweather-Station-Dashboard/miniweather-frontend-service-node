@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import {
   setActiveDeviceAsync,
   setDeviceList,
   setStatus,
   setError,
 } from "../slices/deviceSlice";
+import { useAppDispatch } from "./helper";
 
 export async function fetchDevice(dispatch) {
   dispatch(setStatus("loading"));
@@ -40,7 +40,7 @@ export async function fetchDevice(dispatch) {
 }
 
 export default function useDeviceData() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     fetchDevice(dispatch);

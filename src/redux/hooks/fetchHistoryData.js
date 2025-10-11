@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { setSensorHistoryData } from "../slices/historyDataSlice";
+import { useAppDispatch, useAppSelector } from "./helper";
 
 export default function useSensorHistory() {
-  const dispatch = useDispatch();
-  const activeDevice = useSelector((state) => state.device.activeDevice);
+  const dispatch = useAppDispatch();
+  const activeDevice = useAppSelector((state) => state.device.activeDevice);
 
   const nowRef = useState(() => new Date())[0];
 

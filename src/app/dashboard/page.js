@@ -1,11 +1,8 @@
 "use client";
 
-import { useDispatch, useSelector } from "react-redux";
-import { Thermometer, History, Check, Clock, MapPin, RotateCw } from "lucide-react";
+import { Thermometer, History, Check, Clock, MapPin } from "lucide-react";
 import { Select } from "../../components/Atom";
 import useSensorHistory from "@/redux/hooks/fetchHistoryData";
-import AdditionalInfo from "@/components/AdditionalInfo";
-import ForecastChart from "@/components/ForecastChart";
 import HistoricalChart from "@/components/HistoricalChart";
 import WeatherCard from "@/components/WeatherCard";
 import { setActiveDeviceAsync } from "@/redux/slices/deviceSlice";
@@ -17,6 +14,7 @@ import ArticleSearch from "@/components/ArticleSearch";
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/helper";
 
 const DeviceMap = dynamic(() => import("@/components/DeviceMap"), {
   ssr: false,
@@ -72,13 +70,13 @@ const ToolbarButton = ({ children, disabled, onClick, Icon }) => (
 );
 
 export default function MiniweatherDashboard() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { timeRange, updateTimeRange } = useSensorHistory();
 
-  const historicalData = useSelector((state) => state.sensorHistoryData?.historyData) || [];
-  const sensorData = useSelector((state) => state.sensor);
-  const deviceList = useSelector((state) => state.device.deviceList) || [];
-  const activeDevice = useSelector((state) => state.device.activeDevice);
+  const historicalData = useAppSelector((state) => state.sensorHistoryData?.historyData) || [];
+  const sensorData = useAppSelector((state) => state.sensor);
+  const deviceList = useAppSelector((state) => state.device.deviceList) || [];
+  const activeDevice = useAppSelector((state) => state.device.activeDevice);
 
   const [customStartTime, setCustomStartTime] = useState("");
   const [customEndTime, setCustomEndTime] = useState("");
