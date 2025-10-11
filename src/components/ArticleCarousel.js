@@ -22,7 +22,7 @@ export default function ArticleCarousel() {
         </div>
       ) : (
         <Swiper
-          className="max-w-[80vw]"
+          className="w-full"
           spaceBetween={16}
           slidesPerView={1}
           autoplay={{ delay: 5000, disableOnInteraction: true }}
@@ -35,7 +35,7 @@ export default function ArticleCarousel() {
           modules={[Pagination, Autoplay]}
         >
           {articles.map((article) => (
-            <SwiperSlide key={article.id}>
+            <SwiperSlide key={article.id} className="!h-auto">
               <div
                 onClick={() => router.push(`/articles/${article.id}`)}
                 className="cursor-pointer flex flex-col h-full rounded-lg overflow-hidden border shadow-sm hover:shadow-md transition-shadow"
@@ -45,13 +45,21 @@ export default function ArticleCarousel() {
                   alt={article.title}
                   className="w-full h-40 object-cover"
                 />
-                <div className="p-4 flex flex-col justify-between flex-1">
-                  <h3 className="text-lg font-semibold mb-2">
+
+                {/* Body needs to stretch to keep cards equal height */}
+                <div className="p-4 flex flex-col flex-1">
+                  {/* Title: clamp to 2 lines and lock the block height */}
+                  <h3 className="text-lg font-semibold mb-2 leading-snug line-clamp-2 min-h-[3.5rem]">
                     {article.title}
                   </h3>
-                  <p className="text-sm text-gray-600 line-clamp-3">
+
+                  {/* Description: clamp to 3 lines and lock the block height */}
+                  <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 min-h-[3.75rem]">
                     {article.content}
                   </p>
+
+                  {/* Optional: footer row (date/tags/CTA) pinned to bottom */}
+                  {/* <div className="mt-auto pt-3 text-xs text-gray-500">…</div> */}
                 </div>
               </div>
             </SwiperSlide>
