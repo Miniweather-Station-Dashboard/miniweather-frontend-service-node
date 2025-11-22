@@ -30,7 +30,7 @@ pipeline {
                     docker run -d \
                         --restart=always \
                         --name miniweather-frontend \
-                        --env-file /opt/envs/miniweather-frontend.env \
+                        --env-file /var/jenkins_home/envs/miniweather-frontend.env \
                         -p 9002:3000 \
                         miniweather-frontend-service
                 """
