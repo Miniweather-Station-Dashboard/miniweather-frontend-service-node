@@ -30,7 +30,7 @@ pipeline {
                     docker run -d \
                         --restart=always \
                         --name miniweather-frontend \
-                        --env-file /home/jarkom/miniweather/miniweather-frontend-service-node/.env \
+                        --env-file /opt/envs/miniweather-frontend.env \
                         -p 9002:3000 \
                         miniweather-frontend-service
                 """
