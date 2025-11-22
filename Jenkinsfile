@@ -26,14 +26,17 @@ pipeline {
 
         stage('Run New Container') {
             steps {
-                sh """
-                    docker run -d \
-                        --restart=always \
-                        --name miniweather-frontend \
-                        --env-file /var/jenkins_home/envs/miniweather-frontend.env \
-                        -p 9002:3000 \
-                        miniweather-frontend-service
-                """
+                withCredentials([string(credentialsId: 'miniweather-frontend-api-url', variable: 'NEXT_PUBLIC_API_BASE_URL')]) {
+                    sh """
+                        docker run -d \
+                            --restart=always \
+                            --name miniweather-frontend \
+                            --restart=always \
+                            -e NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL \
+                            -p 9002:3000 \
+                            miniweather-frontend-service
+                    """
+                }
             }
         }
     }
