@@ -10,12 +10,14 @@ export default function useSensorHistory() {
 
   const [timeRange, setTimeRange] = useState(() => {
     const defaultEndTime = nowRef.toISOString();
-    const defaultStartTime = new Date(nowRef.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const defaultStartTime = new Date(
+      nowRef.getTime() - 24 * 60 * 60 * 1000
+    ).toISOString();
     return { startTime: defaultStartTime, endTime: defaultEndTime };
   });
 
   const updateTimeRange = useCallback((newStartTime, newEndTime) => {
-    setTimeRange(prev => {
+    setTimeRange((prev) => {
       if (prev.startTime !== newStartTime || prev.endTime !== newEndTime) {
         return { startTime: newStartTime, endTime: newEndTime };
       }
@@ -25,30 +27,59 @@ export default function useSensorHistory() {
 
   useEffect(() => {
     if (!activeDevice || !timeRange.startTime || !timeRange.endTime) {
+      console.log("🟡 useSensorHistory: missing dependencies", {
+        hasActiveDevice: !!activeDevice,
+        startTime: timeRange.startTime,
+        endTime: timeRange.endTime,
+      });
       return;
     }
 
     const fetchData = async () => {
       const { startTime, endTime } = timeRange;
+
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+      // 🔍 Debug logs
+      console.log("🧩 useSensorHistory ENV:", {
+        NEXT_PUBLIC_API_BASE_URL: baseUrl,
+      });
+
+      console.log("🕒 useSensorHistory timeRange:", {
+        startTime,
+        endTime,
+      });
+
+      console.log("📟 useSensorHistory activeDevice:", activeDevice);
+
+      const url = `${baseUrl}/v1/weather-data?interval=minute&timezone=Asia/Jakarta&endTime=${endTime}&startTime=${startTime}&deviceId=${activeDevice.id}`;
+
+      console.log("🌐 useSensorHistory fetch URL:", url);
+
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/weather-data?interval=minute&timezone=Asia/Jakarta&endTime=${endTime}&startTime=${startTime}&deviceId=${activeDevice.id}`,
-        );
+        const response = await fetch(url);
+
+        console.log("📥 useSensorHistory response status:", response.status);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const result = await response.json();
+
+        console.log("📦 useSensorHistory response body:", result);
 
         if (result.status === "success" && result.data?.data) {
           dispatch(setSensorHistoryData(result.data.data));
         } else {
-          console.error("Failed to fetch sensor history data:", result.message);
+          console.error(
+            "❌ Failed to fetch sensor history data:",
+            result.message
+          );
           dispatch(setSensorHistoryData([]));
         }
       } catch (error) {
-        console.error("Error fetching sensor history data:", error);
+        console.error("🔥 Error fetching sensor history data:", error);
         dispatch(setSensorHistoryData([]));
       }
     };
