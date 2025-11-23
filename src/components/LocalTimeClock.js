@@ -21,23 +21,25 @@ const LocalTimeClock = ({ compact = false }) => {
   return (
     <div
       className={`relative w-full ${
-        compact ? "h-32 sm:h-40 md:h-44" : "h-[45vh]"
-      } rounded-xl overflow-hidden shadow-sm bg-cover bg-center`}
-      style={{
-        backgroundImage: `url('${bgImage}')`,
-      }}
+        compact ? "h-56 md:h-64 lg:h-72" : "aspect-video"
+      } rounded-2xl overflow-hidden shadow-md bg-cover bg-center`}
+      style={{ backgroundImage: `url('${bgImage}')` }}
     >
-      <div className="relative z-10 flex h-full flex-col justify-center text-white text-center select-none">
+      {/* overlay for readability */}
+      <div className="absolute inset-0 bg-black/30" />
+
+      <div className="relative z-10 flex h-full flex-col justify-center text-white text-center select-none px-4">
         <h1
           className={`font-bold ${
-            compact ? "text-xl sm:text-2xl md:text-3xl" : "text-5xl md:text-6xl"
+            compact ? "text-2xl sm:text-3xl" : "text-4xl md:text-5xl"
           } tracking-tight mb-1`}
         >
           Local Time
         </h1>
+
         <p
           className={`font-mono ${
-            compact ? "text-lg sm:text-xl md:text-2xl" : "text-3xl md:text-4xl"
+            compact ? "text-xl sm:text-2xl" : "text-2xl md:text-3xl"
           }`}
         >
           {currentTime.toLocaleTimeString()}

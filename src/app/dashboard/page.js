@@ -34,20 +34,32 @@ const formatToDatetimeLocal = (date) => {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
-// Small building blocks -------------------------------------------------------
-const SectionCard = ({ title, subtitle, icon, right, children, className = "" }) => (
+
+const SectionCard = ({
+  title,
+  subtitle,
+  icon,
+  right,
+  children,
+  className = "",
+}) => (
   <motion.section
-    initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3 }}
-    className={` rounded-2xl border border-gray-200 bg-white/70 backdrop-blur p-4 md:p-5 shadow-sm ${className}`}
+    className={`min-w-0 rounded-2xl border border-gray-200 bg-white/70 backdrop-blur p-4 md:p-5 shadow-sm ${className}`}
   >
     <div className="mb-3 flex items-start justify-between gap-2">
-      <div className="flex items-center gap-2">
-        {icon && <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100">{icon}</span>}
-        <div>
-          <h3 className="text-lg font-semibold leading-tight">{title}</h3>
-          {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+      <div className="flex items-center gap-2 min-w-0">
+        {icon && (
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100">
+            {icon}
+          </span>
+        )}
+        <div className="min-w-0">
+          <h3 className="text-lg font-semibold leading-tight truncate">
+            {title}
+          </h3>
+          {subtitle && (
+            <p className="text-xs text-gray-500 truncate">{subtitle}</p>
+          )}
         </div>
       </div>
       {right}
@@ -56,12 +68,21 @@ const SectionCard = ({ title, subtitle, icon, right, children, className = "" })
   </motion.section>
 );
 
-const ToolbarButton = ({ children, disabled, onClick, Icon }) => (
+const ToolbarButton = ({
+  children,
+  disabled,
+  onClick,
+  Icon,
+}) => (
   <button
     onClick={onClick}
     disabled={disabled}
     className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium shadow-sm ring-1 ring-inset transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500
-      ${disabled ? "bg-gray-200 text-gray-500 ring-gray-200 cursor-not-allowed" : "bg-sky-600 text-white ring-sky-600 hover:bg-sky-700"}
+      ${
+        disabled
+          ? "bg-gray-200 text-gray-500 ring-gray-200 cursor-not-allowed"
+          : "bg-sky-600 text-white ring-sky-600 hover:bg-sky-700"
+      }
     `}
   >
     {Icon && <Icon className="h-4 w-4" />}
@@ -73,14 +94,18 @@ export default function MiniweatherDashboard() {
   const dispatch = useAppDispatch();
   const { timeRange, updateTimeRange } = useSensorHistory();
 
-  const historicalData = useAppSelector((state) => state.sensorHistoryData?.historyData) || [];
+  const historicalData =
+    useAppSelector((state) => state.sensorHistoryData?.historyData) || [];
   const sensorData = useAppSelector((state) => state.sensor);
   const deviceList = useAppSelector((state) => state.device.deviceList) || [];
   const activeDevice = useAppSelector((state) => state.device.activeDevice);
 
   const [customStartTime, setCustomStartTime] = useState("");
   const [customEndTime, setCustomEndTime] = useState("");
-  const hasValidRange = !!customStartTime && !!customEndTime && new Date(customStartTime) < new Date(customEndTime);
+  const hasValidRange =
+    !!customStartTime &&
+    !!customEndTime &&
+    new Date(customStartTime) < new Date(customEndTime);
 
   useEffect(() => {
     if (timeRange.startTime && timeRange.endTime) {
@@ -100,14 +125,16 @@ export default function MiniweatherDashboard() {
   const handleResetTo24Hours = useCallback(() => {
     const now = new Date();
     const defaultEndTime = now.toISOString();
-    const defaultStartTime = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const defaultStartTime = new Date(
+      now.getTime() - 24 * 60 * 60 * 1000
+    ).toISOString();
     setCustomStartTime(formatToDatetimeLocal(new Date(defaultStartTime)));
     setCustomEndTime(formatToDatetimeLocal(new Date(defaultEndTime)));
     updateTimeRange(defaultStartTime, defaultEndTime);
   }, [updateTimeRange]);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-sky-50 via-white to-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-slate-200">
       {/* Decorative background grid */}
       <div
         aria-hidden
@@ -117,13 +144,17 @@ export default function MiniweatherDashboard() {
       {/* Header */}
       <header className="sticky top-0 z-[10000] border-b border-gray-200/70 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-sky-600 text-white shadow-sm">
               <Thermometer className="h-5 w-5" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold leading-tight sm:text-2xl">Miniweather Station Dashboard</h1>
-              <p className="hidden text-xs text-gray-500 sm:block">Real‑time micro‑climate monitoring & early warnings</p>
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold leading-tight sm:text-2xl truncate">
+                Miniweather Station Dashboard
+              </h1>
+              <p className="hidden text-xs text-gray-500 sm:block">
+                Real-time micro-climate monitoring & early warnings
+              </p>
             </div>
           </div>
 
@@ -132,8 +163,11 @@ export default function MiniweatherDashboard() {
               value={activeDevice?.name}
               options={deviceList.map((d) => d.name)}
               onChange={(selectedName) => {
-                const selectedDevice = deviceList.find((d) => d.name === selectedName);
-                if (selectedDevice) dispatch(setActiveDeviceAsync(selectedDevice));
+                const selectedDevice = deviceList.find(
+                  (d) => d.name === selectedName
+                );
+                if (selectedDevice)
+                  dispatch(setActiveDeviceAsync(selectedDevice));
               }}
             />
           </div>
@@ -144,35 +178,41 @@ export default function MiniweatherDashboard() {
       <main className="flex-1 py-6 sm:py-8">
         <div className="container mx-auto grid gap-6 px-4">
           {/* Map + Info */}
-          <div className="grid gap-4 md:grid-cols-5">
-            <SectionCard
-              className="md:col-span-3"
-              title="Perangkat & Lokasi"
-              subtitle={activeDevice?.name || "Pilih perangkat"}
-              icon={<MapPin className="h-4 w-4 text-gray-600" />}
-            >
-              <DeviceMap />
-            </SectionCard>
+          <div className="grid gap-4 md:grid-cols-5 items-start">
+  <SectionCard
+    className="md:col-span-3"
+    title="Perangkat & Lokasi"
+    subtitle={activeDevice?.name || "Pilih perangkat"}
+    icon={<MapPin className="h-4 w-4 text-gray-600" />}
+  >
+    <div className="relative min-h-full min-w-full overflow-hidden rounded-2xl">
+      <DeviceMap />
+    </div>
+  </SectionCard>
 
-            <SectionCard
-              className="md:col-span-2"
-              title="Waktu Lokal"
-              subtitle="Zona waktu otomatis"
-              icon={<Clock className="h-4 w-4 text-gray-600" />}
-            >
-              <div className="flex h-56 justify-center rounded-xl bg-gradient-to-br from-sky-50 to-white">
-                <div className="text-center w-full">
-                  <div className="mb-2 text-4xl font-bold tracking-tight text-sky-700">
-                    <LocalTimeClock />
-                  </div>
-                  <p className="text-sm text-gray-600">Data tersinkron sesuai jam setempat</p>
-                </div>
-              </div>
-            </SectionCard>
-          </div>
+  <SectionCard
+    className="md:col-span-2 h-full"
+    title="Waktu Lokal"
+    subtitle="Zona waktu otomatis"
+    icon={<Clock className="h-4 w-4 text-gray-600" />}
+  >
+    <div className="space-y-3">
+      {/* clock as the hero content */}
+      <LocalTimeClock compact />
+
+      <p className="text-sm text-gray-600 text-center">
+        Data tersinkron sesuai jam setempat
+      </p>
+    </div>
+  </SectionCard>
+</div>
 
           {/* Sensors */}
-          <SectionCard title="Data Sensor Cuaca" subtitle="Pembacaan terkini dari perangkat" icon={<Thermometer className="h-4 w-4 text-gray-600" />}>
+          <SectionCard
+            title="Data Sensor Cuaca"
+            subtitle="Pembacaan terkini dari perangkat"
+            icon={<Thermometer className="h-4 w-4 text-gray-600" />}
+          >
             {sensorData.sensors?.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {sensorData.sensors.map((sensor) => {
@@ -185,11 +225,13 @@ export default function MiniweatherDashboard() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.25 }}
                       whileHover={{ y: -2 }}
-                      className="rounded-2xl border border-gray-200 bg-white/80 p-3 shadow-sm"
+                      className="min-w-0 rounded-2xl border border-gray-200 bg-white/80 p-3 shadow-sm"
                     >
                       <WeatherCard
                         title={sensor.name}
-                        icon={<Thermometer className="h-4 w-4 text-gray-400" />}
+                        icon={
+                          <Thermometer className="h-4 w-4 text-gray-400" />
+                        }
                         value={`${value} ${unit}`}
                         description={sensor.description}
                       />
@@ -219,7 +261,11 @@ export default function MiniweatherDashboard() {
               icon={<History className="h-4 w-4 text-gray-600" />}
               right={
                 <div className="flex items-center gap-2">
-                  <ToolbarButton onClick={handleApplyCustomTimeRange} disabled={!hasValidRange} Icon={Check}>
+                  <ToolbarButton
+                    onClick={handleApplyCustomTimeRange}
+                    disabled={!hasValidRange}
+                    Icon={Check}
+                  >
                     Apply
                   </ToolbarButton>
                   <button
@@ -233,7 +279,10 @@ export default function MiniweatherDashboard() {
             >
               <div className="mb-4 flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <label htmlFor="historicalStartTime" className="text-xs font-medium text-gray-700">
+                  <label
+                    htmlFor="historicalStartTime"
+                    className="text-xs font-medium text-gray-700"
+                  >
                     From
                   </label>
                   <input
@@ -246,7 +295,10 @@ export default function MiniweatherDashboard() {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="historicalEndTime" className="text-xs font-medium text-gray-700">
+                  <label
+                    htmlFor="historicalEndTime"
+                    className="text-xs font-medium text-gray-700"
+                  >
                     To
                   </label>
                   <input
@@ -270,18 +322,25 @@ export default function MiniweatherDashboard() {
               </div>
             </SectionCard>
 
-            <SectionCard className="lg:col-span-3" title="Peringatan Dini" subtitle="Notifikasi otomatis berdasarkan ambang batas">
+            <SectionCard
+              className="lg:col-span-3"
+              title="Peringatan Dini"
+              subtitle="Notifikasi otomatis berdasarkan ambang batas"
+            >
               <EarlyWarning />
             </SectionCard>
           </div>
 
           {/* Articles */}
-          <SectionCard title="Artikel & Edukasi" subtitle="Wawasan cuaca, iklim, dan mitigasi risiko">
+          <SectionCard
+            title="Artikel & Edukasi"
+            subtitle="Wawasan cuaca, iklim, dan mitigasi risiko"
+          >
             <div className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl">
+              <div className="rounded-2xl min-w-0">
                 <ArticleCarousel />
               </div>
-              <div className="rounded-2xl">
+              <div className="rounded-2xl min-w-0">
                 <ArticleSearch />
               </div>
             </div>
@@ -294,8 +353,12 @@ export default function MiniweatherDashboard() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4 text-sm text-gray-600">
           <p>© 2025 Miniweather Station · Semua hak cipta dilindungi</p>
           <div className="flex items-center gap-3">
-            <a className="rounded-lg px-2 py-1 hover:bg-gray-100" href="#">Tentang</a>
-            <a className="rounded-lg px-2 py-1 hover:bg-gray-100" href="#">Kontak</a>
+            <a className="rounded-lg px-2 py-1 hover:bg-gray-100" href="#">
+              Tentang
+            </a>
+            <a className="rounded-lg px-2 py-1 hover:bg-gray-100" href="#">
+              Kontak
+            </a>
           </div>
         </div>
       </footer>
