@@ -92,7 +92,8 @@ const ToolbarButton = ({
 
 export default function MiniweatherDashboard() {
   const dispatch = useAppDispatch();
-  const { timeRange, updateTimeRange } = useSensorHistory();
+  const { timeRange, updateTimeRange, latestTimestamp, resetToLatest } =
+    useSensorHistory();
 
   const historicalData =
     useAppSelector((state) => state.sensorHistoryData?.historyData) || [];
@@ -123,15 +124,8 @@ export default function MiniweatherDashboard() {
   }, [customStartTime, customEndTime, updateTimeRange]);
 
   const handleResetTo24Hours = useCallback(() => {
-    const now = new Date();
-    const defaultEndTime = now.toISOString();
-    const defaultStartTime = new Date(
-      now.getTime() - 24 * 60 * 60 * 1000
-    ).toISOString();
-    setCustomStartTime(formatToDatetimeLocal(new Date(defaultStartTime)));
-    setCustomEndTime(formatToDatetimeLocal(new Date(defaultEndTime)));
-    updateTimeRange(defaultStartTime, defaultEndTime);
-  }, [updateTimeRange]);
+    resetToLatest();
+  }, [resetToLatest]);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-slate-200">
@@ -277,6 +271,14 @@ export default function MiniweatherDashboard() {
                 </div>
               }
             >
+              {latestTimestamp && (
+                <p className="mb-3 text-xs text-gray-500">
+                  Rentang otomatis diarahkan ke data terakhir yang tersedia.
+                  Data terakhir:{" "}
+                  {new Date(latestTimestamp).toLocaleString("id-ID")}
+                </p>
+              )}
+
               <div className="mb-4 flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
                   <label

@@ -12,6 +12,15 @@
   animation: pulse 2s infinite;
 }
 
+/* Marker for the currently selected device. */
+.pulse-marker-active {
+  background: rgba(2, 132, 199, 0.85);
+  border-color: #0369a1;
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.25);
+  transform: scale(1.15);
+  animation: none;
+}
+
 @keyframes pulse {
   0% {
     transform: scale(1);
