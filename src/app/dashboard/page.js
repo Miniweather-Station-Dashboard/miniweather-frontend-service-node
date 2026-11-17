@@ -1,6 +1,6 @@
 "use client";
 
-import { Thermometer, History, Check, Clock, MapPin } from "lucide-react";
+import { Thermometer, History, Check, Clock, MapPin, RefreshCw } from "lucide-react";
 import { Select } from "../../components/Atom";
 import useSensorHistory from "@/redux/hooks/fetchHistoryData";
 import HistoricalChart from "@/components/HistoricalChart";
@@ -11,6 +11,7 @@ import EarlyWarning from "@/components/EarlyWarning";
 import ArticleCarousel from "@/components/ArticleCarousel";
 import ArticleSearch from "@/components/ArticleSearch";
 
+import { formatWibInput, parseWibInput, formatWib } from "@/helper/history.mjs";
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
@@ -23,18 +24,6 @@ const DeviceMap = dynamic(() => import("@/components/DeviceMap"), {
   ),
 });
 
-const formatToDatetimeLocal = (date) => {
-  if (!date) return "";
-  const pad = (num) => (num < 10 ? "0" + num : num);
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-};
-
-
 const SectionCard = ({
   title,
   subtitle,
@@ -42,11 +31,12 @@ const SectionCard = ({
   right,
   children,
   className = "",
+  headerClassName = "",
 }) => (
   <motion.section
     className={`min-w-0 rounded-2xl border border-gray-200 bg-white/70 backdrop-blur p-4 md:p-5 shadow-sm ${className}`}
   >
-    <div className="mb-3 flex items-start justify-between gap-2">
+    <div className={`mb-3 flex items-start justify-between gap-2 ${headerClassName}`}>
       <div className="flex items-center gap-2 min-w-0">
         {icon && (
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100">
@@ -73,6 +63,7 @@ const ToolbarButton = ({
   disabled,
   onClick,
   Icon,
+  secondary = false,
 }) => (
   <button
     onClick={onClick}
@@ -81,7 +72,9 @@ const ToolbarButton = ({
       ${
         disabled
           ? "bg-gray-200 text-gray-500 ring-gray-200 cursor-not-allowed"
-          : "bg-sky-600 text-white ring-sky-600 hover:bg-sky-700"
+          : secondary
+            ? "bg-white text-gray-700 ring-gray-300 hover:bg-gray-50"
+            : "bg-sky-600 text-white ring-sky-600 hover:bg-sky-700"
       }
     `}
   >
@@ -92,7 +85,7 @@ const ToolbarButton = ({
 
 export default function MiniweatherDashboard() {
   const dispatch = useAppDispatch();
-  const { timeRange, updateTimeRange, latestTimestamp, resetToLatest } =
+  const { timeRange, updateTimeRange, latestTimestamp, resetToLatest, refresh, historyLoading, latestLoading, historyError, latestError } =
     useSensorHistory();
 
   const historicalData =
@@ -103,24 +96,25 @@ export default function MiniweatherDashboard() {
 
   const [customStartTime, setCustomStartTime] = useState("");
   const [customEndTime, setCustomEndTime] = useState("");
-  const hasValidRange =
-    !!customStartTime &&
-    !!customEndTime &&
-    new Date(customStartTime) < new Date(customEndTime);
+  const parsedStartTime = parseWibInput(customStartTime);
+  const parsedEndTime = parseWibInput(customEndTime);
+  const hasValidRange = Boolean(
+    parsedStartTime && parsedEndTime && parsedStartTime < parsedEndTime
+  );
 
   useEffect(() => {
     if (timeRange.startTime && timeRange.endTime) {
-      setCustomStartTime(formatToDatetimeLocal(new Date(timeRange.startTime)));
-      setCustomEndTime(formatToDatetimeLocal(new Date(timeRange.endTime)));
+      setCustomStartTime(formatWibInput(new Date(timeRange.startTime)));
+      setCustomEndTime(formatWibInput(new Date(timeRange.endTime)));
     }
   }, [timeRange]);
 
   const handleApplyCustomTimeRange = useCallback(() => {
     if (!customStartTime || !customEndTime) return;
-    const start = new Date(customStartTime);
-    const end = new Date(customEndTime);
-    if (start >= end) return;
-    updateTimeRange(start.toISOString(), end.toISOString());
+    const start = parseWibInput(customStartTime);
+    const end = parseWibInput(customEndTime);
+    if (!start || !end || start >= end) return;
+    updateTimeRange(start, end);
   }, [customStartTime, customEndTime, updateTimeRange]);
 
   const handleResetTo24Hours = useCallback(() => {
@@ -249,33 +243,34 @@ export default function MiniweatherDashboard() {
           {/* Historical + Early Warning */}
           <div className="grid gap-4 lg:grid-cols-7">
             <SectionCard
-              className="lg:col-span-4"
+              className="lg:col-span-4 !bg-white !backdrop-blur-none"
+              headerClassName="flex-wrap"
               title="Data Historis"
-              subtitle="Sesuaikan rentang waktu untuk analisis"
+              subtitle="Rentang pengamatan dalam WIB"
               icon={<History className="h-4 w-4 text-gray-600" />}
               right={
-                <div className="flex items-center gap-2">
+                <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
                   <ToolbarButton
                     onClick={handleApplyCustomTimeRange}
-                    disabled={!hasValidRange}
+                    disabled={!activeDevice || !hasValidRange || historyLoading}
                     Icon={Check}
                   >
                     Apply
                   </ToolbarButton>
                   <button
                     onClick={handleResetTo24Hours}
-                    className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                    disabled={!activeDevice || historyLoading || latestLoading}
+                    className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-800 shadow-sm transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                   >
                     <History className="h-4 w-4" /> Last 24 Hrs
                   </button>
+                  <ToolbarButton onClick={refresh} disabled={!activeDevice || historyLoading || latestLoading} Icon={RefreshCw} secondary>Refresh</ToolbarButton>
                 </div>
               }
             >
               {latestTimestamp && (
                 <p className="mb-3 text-xs text-gray-500">
-                  Rentang otomatis diarahkan ke data terakhir yang tersedia.
-                  Data terakhir:{" "}
-                  {new Date(latestTimestamp).toLocaleString("id-ID")}
+                  Data terakhir: {formatWib(latestTimestamp)}
                 </p>
               )}
 
@@ -285,12 +280,12 @@ export default function MiniweatherDashboard() {
                     htmlFor="historicalStartTime"
                     className="text-xs font-medium text-gray-700"
                   >
-                    From
+                    From (WIB)
                   </label>
                   <input
                     type="datetime-local"
                     id="historicalStartTime"
-                    max={formatToDatetimeLocal(new Date())}
+                    max={formatWibInput(new Date())}
                     value={customStartTime}
                     onChange={(e) => setCustomStartTime(e.target.value)}
                     className="w-52 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
@@ -301,12 +296,12 @@ export default function MiniweatherDashboard() {
                     htmlFor="historicalEndTime"
                     className="text-xs font-medium text-gray-700"
                   >
-                    To
+                    To (WIB)
                   </label>
                   <input
                     type="datetime-local"
                     id="historicalEndTime"
-                    max={formatToDatetimeLocal(new Date())}
+                    max={formatWibInput(new Date())}
                     value={customEndTime}
                     onChange={(e) => setCustomEndTime(e.target.value)}
                     className="w-52 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
@@ -319,8 +314,11 @@ export default function MiniweatherDashboard() {
                 )}
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white/70 p-2 shadow-inner">
-                <HistoricalChart data={historicalData} />
+              <div className="rounded-xl border border-gray-200 bg-white p-4">
+                <div role="status" aria-live="polite" className="mb-3 text-xs text-gray-500">{historyLoading || latestLoading ? "Memuat data…" : `${historicalData.length} titik pengamatan`}</div>
+                {historyError && <p role="alert" className="mb-3 text-sm text-rose-700">{historyError}</p>}
+                {latestError && <p role="alert" className="mb-3 text-sm text-rose-700">{latestError}</p>}
+                <HistoricalChart data={historicalData} timeRange={timeRange} />
               </div>
             </SectionCard>
 
